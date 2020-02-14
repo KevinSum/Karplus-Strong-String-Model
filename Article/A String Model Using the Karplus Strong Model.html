@@ -1,0 +1,616 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>A String Model Using the Karplus Strong Model</title></head><body>
+<h1 style="text-align: center;">A String Model Using the Karplus Strong
+Model</h1>
+
+<h2>Introduction to Physical Modelling Synthesis</h2>
+
+Physical modelling synthesis involves simulating real world physics
+using mathematical equations in order to synthesize sounds. All musical
+instruments are vibrations caused by an <span style="font-size: 12pt; line-height: 107%; font-family: &quot;Times New Roman&quot;,serif;">exciter
+</span> and can be
+described with a mathematical model. By recreating the physical
+properties of an instrument and how we interact with them, we can
+create sounds which resemble the original instrument. <br>
+
+<h3>Benefits and Drawbacks</h3>
+
+Physical modelling synthesis allows for a large variety of sounds to be
+produced. By varying the parameters needed to defined in the model (E.g.
+pick position of a string, or the level of damping of a drum),
+we can achieve all sorts of different and interesting timbres. We can
+also produce sounds that may not be possible in real life. For example,
+we aren't subject to real life issues such as strings snapping when
+pulled too far or absurdly large drum membranes. However, compared to
+sampling synthesis, physical modelling is considered inferior in terms
+of accurately recreating the original instrument due the difficulties
+involved in describing complex models of real instruments. It's also
+more CPU intensive. Essentially, we are sacrificing a more accurate
+sounding model for one that can create more diverse, varied and
+arguably creative sounds! <br>
+
+<h2>The Karplus Strong Model</h2>
+
+Firstly, let's look at how a typical string works. Plucking a
+string induces a high amount of energy in the string and causes it to
+vibrate, creating a sound full of different frequencies and overtones.
+The fundamental frequency of this sound is dependent on the length,
+thickness and mass of the string. The string then starts to lose energy
+due to the string tension and air resistance. Some frequencies will die
+out faster than others, depending on factors such as the material of
+the string, or the body of what it's attached to. The Karplus Strong
+model essentially tries to replicate this [1].<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 519px; height: 192px;" alt="KS Diagram" src="Images/Karplus-strong-schematic.png"><br>
+Figure 1 - Diagram of the Karplus Strong Model<br>
+<br>
+</div>
+
+The model begins with white noise as an "excitation signal", the
+sample length (L) of which is dependent on the desired fundamental
+frequency. This is then outputted as well as fed into a delay line, of
+which the length is also dependent on the fundamental frequency. Lastly
+the signal is put through a low pass filter before being mixed back
+into the output. <br>
+
+<br>
+
+The white noise excitation signal serves to replicate the initial pluck
+of a string, as the randomness of white noise produces the many
+different frequencies initially created. To find the required sample length of
+this signal, we'd take the sample frequency and divide it by the
+desired fundamental frequency to get the required sample length (for
+example, if we wanted the note A3, which is at 220Hz, we'd divide the
+sampling frequency, often 44.1 kHz, by this to get a sample length of
+200 samples). <br>
+
+<br>
+
+The delay line feeds the signal that's delayed by L samples back, so
+that the same signal is played straight after the initial excitation
+signal. Now the output is just the same signal being outputted repeatedly,
+so the output will have a fundamental frequency of the length of the
+excitation signal L.<br>
+
+&nbsp;<br>
+
+<div style="text-align: center;"><img style="width: 707px; height: 421px;" alt="Loop example" src="Images/KS%20Loop%20Diagram.png"><br>
+Figure 2 - The output waveform<br>
+</div>
+
+<br>
+
+However, as shown in figure 3, higher frequencies tend to die out
+faster that lower frequencies, which is achieved by the lowpass filter
+after the delay line.<br>
+
+<br>
+
+<br>
+
+<div style="text-align: center;">
+<audio controls=""><source src="audio/Guitar%20String%20Pluck%20A2.wav" type="audio/wav"></source>Your
+browser does not support the audio tag.</audio>
+<br>
+&nbsp;Audio 1 - A guitar string
+playing A2 (110Hz)<br>
+&nbsp;<img style="width: 560px; height: 420px;" alt="Guitar A2 spectrogram" src="Images/Spectrogram%20of%20Guitar%20Note%20A2.jpg"><br>
+Figure 3 - Spectrogram of a recorded guitar string played A2 (110Hz)<br>
+</div>
+
+<br>
+
+The resultant output is a sound that roughly resembles a
+plucked string. <br>
+
+<h2>
+The MATLAB Application</h2>
+
+<div style="text-align: center;"><img style="width: 653px; height: 857px;" alt="GUI" src="Images/GUI.PNG"><br>
+Figure 4 - The MATLAB App GUI<br>
+<br>
+</div>
+The MATLAB app allows you to easily use the Karplus Strong model and
+create your own sounds. It gives you the option to choose the
+excitation wave, the cut-off frequency of the lowpass loop filter, and
+choose the fundamental frequency of the sound output using a
+keyboard. <br>
+
+<br>
+
+Additional features include feedback gain, which essentially does
+the same job that the lowpass loop filter does but across all
+frequencies. This gives the option to have a shorter output
+which doesn't ring out as much. There's also the option to add a delay
+effect, allowing the user to add some constructive/destructive
+interference with a short delay setting, or simply have a nice echo
+with a long delay setting! <br>
+<br>
+To view code, open KarplusStrongApp.mlapp from within MATLAB.<br>
+
+<h2>
+The Code</h2>
+
+<h3>
+Fundamental Frequency </h3>
+
+Firstly, a variable is initialized containing the value 110. This is
+the initial fundamental frequency used. Each key on the keyboard has
+a call-back function, which changes the fundamental frequency relative
+to the initial value of 110 Hz using equal temperament [2]. It'll then
+run the Karplus Strong
+Algorithm using this fundamental frequency. The octave up and down
+buttons changes the frequency that the notes are relative to (Multiply
+by two for an octave higher, divide by two for an octave lower).<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><span style="font-family: Segoe UI;">octave = 110; <span style="color: rgb(51, 204, 0);"><span style="color: rgb(0, 102, 0);">%
+Initial Octave - A2</span> &nbsp;</span> </span><br style="font-family: Segoe UI;">
+
+<br style="color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Button
+pushed function: AButton</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">function</span> note_A(app, event)</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; f0 = app.octave;</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; karplus(app,
+f0);</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(51, 51, 255);">end</span><br>
+
+<br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Button
+pushed function: AButton</span><span style="font-family: Segoe UI;"><span style="color: rgb(0, 102, 0);">_2</span><br>
+<span style="color: rgb(51, 51, 255);">function</span>
+note_A_sharp(app, event)</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; f0 = app.octave
+* 2.^(1/12);</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; karplus(app,
+f0);</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(51, 51, 255);">end</span><br>
+
+<br>
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% etc</span><br>
+
+<br>
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Button
+pushed function: OctaveDownButton</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">function</span> OctaveDown(app, event)</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; app.octave =
+app.octave / 2;</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">end</span></span><br>
+
+<br>
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Button
+pushed function: OctaveUpButton</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">function</span> OctaveDown(app, event)</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; app.octave =
+app.octave * 2;</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">end</span></span><br>
+
+<hr style="width: 100%; height: 2px;">
+<h3>Excitation Signal</h3>
+
+To generate the desired excitation signal, we have a function which
+outputs the signal depending on which button is chosen on the button
+group. <br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);"><span style="color: black;">fs = 44100; </span><span style="color: rgb(0, 102, 0);">% Sample Rate</span><br style="color: rgb(0, 102, 0);">
+<br>
+function</span> output = excitationSignal(app, L, f0)</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; t = 0:L; <span style="color: rgb(0, 102, 0);">% Create vector of values for string</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><br>
+</span><span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(0, 102, 0);">% If statement for button group</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">if</span> app.WhiteNoiseButton.Value
+== true</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output = (rand(1, L) - 0.5); <span style="color: rgb(0, 102, 0);">% Create white noise</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">elseif</span> app.ChirpButton.Value
+== true</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output =
+chirp(t/(app.fs/f0),0,L/(app.fs/f0),app.EndfrequencyHzEditField.Value)
+/ 2; <span style="color: rgb(0, 102, 0);">% Create chirp which goes
+from 0Hz to what is defined by the user in the edit field</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">elseif</span> app.SineButton.Value ==
+true</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output = sin(2*pi*(t/(app.fs/f0))) / 2; <span style="color: rgb(0, 102, 0);">% Create one period of a sine wave</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">elseif</span>
+app.TriangleButton.Value == true</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output = sawtooth(2*pi*(t/(app.fs/f0))) / 2; <span style="color: rgb(0, 102, 0);">% Create one period of a triangle wave</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">elseif</span> app.SquareButton.Value
+== true</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output = square(2*pi*(t/(app.fs/f0))) / 2; <span style="color: rgb(0, 102, 0);">% Create one period of a square wave</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(51, 51, 255);">end</span></span><span style="font-family: Segoe UI;"><br>
+<br>
+</span><span style="font-family: Segoe UI; color: rgb(51, 51, 255);">end</span><br>
+
+<hr style="width: 100%; height: 2px;">
+<h3>The Delay Line Loop</h3>
+
+<br>
+The delay line loop exists as a separate file as a function (loop.m). The
+function takes the excitation signal to use in the delay line. It then
+outputs the last sample in the delay line and shifts the delay line one
+sample across whilst moving the last sample to the beginning of the
+line. This repeats for as long as we want the note length to be (though
+it's fixed at 3 seconds in the app to prevent long loading times).<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">function</span>
+output = loop( delayLine, noteLength, gain, fc, fs)</span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%This
+function outputs a karplus strong note sound based on input</span><br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%parameters
+- </span><br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%karplus(delay
+line/excitation signal, length of sound, feedback gain, cut-off
+frequency) </span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Get
+length of input delay line</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">L = length(delayLine);</span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Output</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">output = zeros(1,L);</span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">for </span>n = 1:noteLength</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(0, 102, 0);">% Set current output sample to the
+final value in the delay line</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; output(n) =
+delayLine(L);</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; <span style="color: rgb(0, 102, 0);">% Shift delay_line wave one step right</span></span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; delayLine =
+[filterOutput, delayLine(1:L-1)];</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(51, 51, 255);">end</span><br>
+
+<hr style="width: 100%; height: 2px;">
+<h3>Lowpass filter and gain filter<br>
+</h3>
+
+The lowpass filter is was applied using the <span style="font-size: 12pt; line-height: 107%; font-family: &quot;Times New Roman&quot;,serif;">differential
+</span> equation and
+filter co-efficients for a 2nd order filter given by Udo Zolzer in his
+book DAFX: Digital Audio Effects[3]. This would be used on the last sample
+of the delay line before it's moved to the beginning of the line, and
+would be implemented by keeping a record of the last two input and
+output samples in arrays to use in the <span style="font-size: 12pt; line-height: 107%; font-family: &quot;Times New Roman&quot;,serif;">differential
+</span> equation.<br>
+
+<br>
+
+The feedback gain is simple: Multiply the last sample in the delay line
+by a value less than one before moving it to the beginning of the delay
+line.<br>
+
+<span style="font-family: &quot;Calibri&quot;,sans-serif;"><br>
+</span>
+<hr style="width: 100%; height: 2px;"><span style="font-family: Segoe UI;"><span style="color: rgb(51, 51, 255);">function</span>
+output = loop( delayLine, noteLength, gain, fc, fs)</span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%This
+function outputs a karplus strong note sound based on the input</span><br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%parameters
+- </span><br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">%karplus(delay
+line/excitation signal, length of sound, feedback gain, cut-off
+frequency) </span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI; color: rgb(0, 102, 0);">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Get
+length of the input delay line</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">L = length(delayLine);</span><br style="font-family: Segoe UI;">
+
+<br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI; color: rgb(0, 102, 0);">% Output</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: Segoe UI;">output = zeros(1,L);</span><br style="font-family: Segoe UI;">
+
+<span style="font-family: &quot;Calibri&quot;,sans-serif;"><span style="color: rgb(0, 102, 0); font-family: Segoe UI;"><br>
+% 2nd Order Low pass filter coefficients</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">k = tan(pi*fc/fs);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">b0 = k^2/(1+sqrt(2)*k + k^2);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">b1 = 2*k^2/(1 + sqrt(2)*k + k^2);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">b2 = k^2/(1+sqrt(2)*k + k^2);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">a1 = 2*(k^2-1)/(1+sqrt(2)*k + k^2);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">a2 = (1-sqrt(2)*k +
+k^2)/(1+sqrt(2)*k + k^2);</span><br style="font-family: Segoe UI;">
+<br style="font-family: Segoe UI;">
+<span style="color: rgb(0, 102, 0); font-family: Segoe UI;">% Arrays to
+store previous filter inputs and outputs</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">x = [0 0];</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">y = [0 0];</span><br style="font-family: Segoe UI;">
+<br style="font-family: Segoe UI;">
+<span style="color: rgb(51, 51, 255); font-family: Segoe UI;">for</span><span style="font-family: Segoe UI;"> n = 1:noteLength</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><span style="color: rgb(0, 102, 0); font-family: Segoe UI;">% Set current
+output sample to the final value in the delay line</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; output(n) =
+delayLine(L);</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><span style="color: rgb(0, 102, 0); font-family: Segoe UI;">% Low Pass Filter</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; filterOutput =
+b0*delayLine(L) + b1*x(1) + b2*x(2) - a1*y(1) - a2*y(2);</span><br style="font-family: Segoe UI;">
+<br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><span style="color: rgb(0, 102, 0); font-family: Segoe UI;">% Feedback gain</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; filterOutput =
+filterOutput * gain; </span><br style="font-family: Segoe UI;">
+<br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><span style="color: rgb(0, 102, 0); font-family: Segoe UI;">%Save current
+filter input and output values to use as the "previous" values for the
+next loop</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; x =
+[delayLine(L) x(1)];</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; y =
+[filterOutput y(1)];</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; </span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;</span><span style="color: rgb(0, 102, 0); font-family: Segoe UI;">&nbsp; % Shift
+delay_line wave one step right</span><br style="font-family: Segoe UI;">
+<span style="font-family: Segoe UI;">&nbsp;&nbsp;&nbsp; delayLine =
+[filterOutput, delayLine(1:L-1)];</span><br style="font-family: Segoe UI;">
+<span style="color: rgb(51, 51, 255); font-family: Segoe UI;">end</span><br>
+</span>
+<hr style="width: 100%; height: 2px;">
+<h3>Delay Effect</h3>
+
+The delay effect can be applied on the final output as a feedback comb
+filter once we have the filter co-efficients for the transfer function.<br>
+
+<div style="text-align: center;"><img style="width: 760px; height: 277px;" alt="Comb Filter" src="Images/comb%20filter%20diagram.png"><br>
+Figure 5 - Feedback comb filter diagram<br>
+</div>
+
+<span style="font-family: &quot;Calibri&quot;,sans-serif;"><br>
+<span style="font-family: Times New Roman,Times,serif;">y[n] = x[n] = +
+gy[n-M]</span><br style="font-family: Times New Roman,Times,serif;">
+<br style="font-family: Times New Roman,Times,serif;">
+<span style="font-family: Times New Roman,Times,serif;">We then apply
+the z transform to get our transfer function and co-efficients</span><br style="font-family: Times New Roman,Times,serif;">
+<br style="font-family: Times New Roman,Times,serif;">
+<span style="font-family: Times New Roman,Times,serif;">Y(Z) = X(Z) +
+gY(Z)*Z^(-M)</span><br style="font-family: Times New Roman,Times,serif;">
+<br style="font-family: Times New Roman,Times,serif;">
+<span style="font-family: Times New Roman,Times,serif;">Y(Z)/X(Z) =
+Z^M/(Z^M - g)</span><br>
+<br>
+</span>
+<hr style="width: 100%; height: 2px;"><span style="font-family: &quot;Calibri&quot;,sans-serif;">T = 1/44100; <span style="color: rgb(0, 102, 0);">% Sampling interval</span><br>
+<br>
+<span style="color: rgb(0, 102, 0);">% Delay Effect - Comb Filter</span><br>
+Tc = app.DelayTimeKnob.Value; <span style="color: rgb(0, 102, 0);">%
+Delay in seconds</span><br>
+M = Tc/T; <span style="color: rgb(0, 102, 0);">% Number of sampling
+intervals</span><br>
+RT60 = app.DecayTimeKnob.Value; <span style="color: rgb(0, 102, 0);">%
+Time required for echoes to decay by 60dB</span><br>
+g = 0.001^(Tc/RT60); <span style="color: rgb(0, 102, 0);">% Adder</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+b = [1 zeros(1, round(M))]; <span style="color: rgb(0, 102, 0);">%
+Filter Numerator</span><br>
+a = [1 zeros(1, round(M)-1) -g];<span style="color: rgb(0, 102, 0);"> %
+Filter Denominator</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+<span style="color: rgb(51, 51, 255);">if </span>app.DelayTimeKnob.Value&gt;0
+<span style="color: rgb(0, 102, 0);">% Exception for when delay time is
+set to 0, as this causes no output</span><br>
+&nbsp;&nbsp;&nbsp; out = filter(b, a, out); <span style="color: rgb(0, 102, 0);">% Apply filter</span><br>
+<span style="color: rgb(51, 51, 255);">end</span><br>
+</span>
+<hr style="width: 100%; height: 2px;"><span style="font-family: &quot;Calibri&quot;,sans-serif;"></span>
+<h2 style="font-family: Times New Roman,Times,serif;">Analysis</h2>
+
+<span style="font-family: Times New Roman,Times,serif;">When the model
+outputs sound, 3 graphs are given so that we can analyse the output (as
+well as check that the model is working!). The first graph is the time
+domain graph of the initial excitation signal. The second is a time
+domain graph of the output. The third gives us a spectrogram/frequency
+analysis of the output. </span><br>
+
+<h3 style="font-family: Times New Roman,Times,serif;">Guitar Preset<br>
+</h3>
+
+<div style="text-align: center;"><audio controls=""><source src="audio/Guitar%20Preset.wav" type="audio/wav"></source>Your
+browser does not support the audio tag.</audio><br>
+Audio 1 - Guitar Preset A2 (110Hz)<br>
+</div>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 1147px; height: 575px;" alt="Guitar Preset Analysis" src="Images/Guitar%20Preset%20Analysis.jpg"><br>
+Figure 6 - Guitar Preset Analysis - A2 (110Hz)<br>
+</div>
+
+<br>
+
+This preset attempts to replicate the
+guitar from Audio 1. It uses white noise as the excitation signal, as
+used in the original Karplus Strong model. The lowpass cut-off
+frequency
+is set at 4kHz, replicating the spectrogram of a real
+guitar string in figure 3. The feedback gain is set fairly high to
+emulate a string ringing out. It uses no delay.<br>
+
+<br>
+
+<h3>Synth Preset<br>
+</h3>
+
+<div style="text-align: center;"><audio controls=""><source src="audio/Synth%20Preset.wav" type="audio/wav"></source>Your
+browser does not support the audio tag.</audio><br>
+<br>
+Audio 3 - Synth Preset A2 (110Hz)
+</div>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 1182px; height: 592px;" alt="Synth Preset Analysis" src="Images/Synth%20Preset%20Analysis.jpg"><br>
+Figure 7 - Synth Preset Analysis - A2 (110Hz)<br>
+</div>
+
+<br>
+
+This preset gives a more typical synth sound, using a square wave as
+the excitation signal. It uses a fairly high lowpass cut-off frequency
+of 15kHz and a low feedback gain of 0.97. With such a such cut-off
+frequency, more of the square wave's natural timbre is present, as shown on the spectrogram. No delay was used.<br>
+
+<h3>Echo Preset<br>
+</h3>
+
+<div style="text-align: center;"><audio controls=""><source src="audio/Echo%20Preset.wav" type="audio/wav"></source>Your
+browser does not support the audio tag.</audio><br>
+<br>
+Audio 4 - Echo Preset A2 (110Hz)<br>
+</div>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 1123px; height: 563px;" alt="Echo Preset" src="Images/Echo%20Preset%20Analysis.jpg"><br>
+Figure 8 - Echo Preset Analysis - A2 (110Hz)<br>
+</div>
+
+<br>
+
+This preset used a chirp excitation wave with a start frequency of 0Hz
+to an end frequency of 30Hz. This uses a delay of 0.1 seconds (which
+we can see on the spectrogram) and a decay time of 5 seconds. The time
+domain response is quite interesting, as we can see some constructive interference involved with each delay.<br>
+
+<h3>Metallic Preset<br>
+</h3>
+
+<div style="text-align: center;"><audio controls=""><source src="audio/Metallic%20Preset.wav" type="audio/wav"></source>Your
+browser does not support the audio tag.</audio><br>
+<br>
+Audio 5 - Metallic Preset A2 (110Hz)<br>
+</div>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 1120px; height: 561px;" alt="Metallic Preset Analysis" src="Images/Metallic%20Preset%20Analysis.jpg"><br>
+Figure 9 - Metallic Preset Analysis - A2 (110Hz)<br>
+</div>
+
+<br>
+
+This preset has a triangle excitation waveform, a lowpass cut-off
+frequency of 5kHz, feedback gain of 0.995, a short delay time of 0.02
+seconds and decay time of 2 seconds. Once again, there's a lot of
+constructive/destructive interfence due to the delay effect. It's also
+interesting to note that the higher frequencies above the 5kHz cut-off
+are still somewhat present for the first 0.5 seconds or so. This is
+likely due to the fast delay time of the delay effect retaining the
+higher frequencies and feeding them back in.<br>
+
+<h2>Conclusions and Improvements</h2>
+
+The system does a fairly good job of producing varied and interesting sounds
+that aren't limited to a guitar pluck. However, there're
+improvements that can be made. You could look into
+specific harmonics are damped in a real guitar, rather than simply
+using a lowpass filter. Work on this was done by Karjalainen, Valimaki
+and Janosy which led to a loop filter that created a very realistic
+guitar sound [4]. The extended Karplus Strong Algorithm could also be
+explored [5].<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 771px; height: 129px;" alt="Extended Karplus Strong Algorithm" src="Images/Extended_KS_Algorithm.png"><br>
+Figure 10 - The extended Karplus Strong Algorithm [4]<br>
+<br>
+<div style="text-align: left;">Word Count: 2000 words.<br>
+</div>
+
+</div>
+
+<h2>References</h2>
+[1] Karplus, K. and Strong, A. (1983). Digital Synthesis of Plucked-String and Drum Timbres. Computer Music Journal, 7(2), p.43<br>
+[2] Pages.mtu.edu. (n.d.). Scales: Just vs Equal Temperament. [online]
+Available at: https://pages.mtu.edu/~suits/scales.html [Accessed 19
+Apr. 2018].<br>
+[3] Zo&#776;lzer, U. (2011). DAFX - digital audio effects. Chichester: John Wiley &amp; Sons.<br>
+[4] Karjalainen, M., Välimäki, V. and Jánosy, Z. (1993). Towards
+High-Quality Sound Synthesis of the Guitar and String Instruments.
+[online] Users.spa.aalto.fi. Available at:
+http://users.spa.aalto.fi/vpv/publications/icmc93-guitar.htm [Accessed
+19 Apr. 2018].<br>
+[5] Smith, J. (2011). Physical audio signal processing. [Lexington]: W3K Publishing.<br>
+[6] Sanders, S. and Weiss, R. (n.d.). Synthesizing a Guitar Using
+Physical Modeling Techniques. [online] Ee.columbia.edu. Available at:
+http://www.ee.columbia.edu/~ronw/dsp/ [Accessed 19 Apr. 2018].<br>
+[7] SoundBridge. (2017). Physical Modelling Synthesis - SoundBridge.
+[online] Available at:
+https://soundbridge.io/physical-modelling-synthesis/ [Accessed 19 Apr.
+2018].<br>
+[8] Rahtz, M. (2015). Karplus-Strong String Synthesis. [online]
+Amid.fish. Available at: http://amid.fish/karplus-strong [Accessed 19
+Apr. 2018].<br>
+</body></html>
